@@ -23,8 +23,10 @@ int Dif(Node *root)
 
             Node *new_l = new Node;
             new_l->s_data = new char[30];
+            new_l->type = OPER;
             Node *new_r = new Node;
             new_r->s_data = new char[30];
+            new_r->type = OPER;
 
             strcpy(root->s_data, "+");
             strcpy(new_r->s_data, "*");
@@ -55,8 +57,11 @@ int Dif(Node *root)
 
             Node *new_l = new Node;
             new_l->s_data = new char[30];
+            new_l->type = OPER;
+
             Node *new_r = new Node;
             new_r->s_data = new char[30];
+            new_r->type = OPER;
 
             strcpy(new_r->s_data, "^");
             strcpy(new_l->s_data, "-");
@@ -80,9 +85,6 @@ int Dif(Node *root)
             new_l->right->left = r_copyroot;
             new_l->right->right = root->left;
 
-
-            
-            
             new_r->left = root->right;
 
             new_r->right = new Node;
@@ -97,13 +99,80 @@ int Dif(Node *root)
             new_r->parent = root;
         }
         else if (strcmp(root->s_data, "^") == 0) {
-            ;
+            if (root->left->type == CONSTANT) {
+                root->d_data = 0;
+                root->type = CONSTANT;
+            }
+            else if (root->left->type == VARIOUS || root->left->type == OPER) {
+                strcpy(root->s_data, "*");
+
+                Node *new_l = new Node;
+                new_l->s_data = new char[30];
+                Node *new_r = new Node;
+                new_r->s_data = new char[30];
+
+                strcpy(new_l->s_data, "^");
+                new_l->type = OPER;
+
+                strcpy(new_r->s_data, "*");
+                new_l->type = OPER;
+
+
+
+                Node *l_copyroot = new Node;
+                l_copyroot->s_data = new char[30];
+                CopyBranch(root->left, l_copyroot);
+                Dif(l_copyroot);
+
+                new_l->left = root->left;
+                new_l->right->d_data = root->right->d_data - 1;
+
+                new_r->left = l_copyroot;
+                new_r->right = new Node;
+                new_r->right->type = CONSTANT;
+                new_r->right->s_data = new char[30];
+                new_r->right->d_data = root->right->d_data;
+         
+                root->left = new_l;
+                root->right = new_r;
+            }
         }
         else if (strcmp(root->s_data, "sin") == 0) {
-            ;
+            Node *copyarg = new Node;
+            copyarg->s_data = new char[30];
+            CopyBranch(root->left, copyarg);
+            Dif(copyarg);
+
+            Node *new_l = new Node;
+            new_l->s_data = new char[30];
+            new_l->type = OPER;
+
+            strcpy(root->s_data, "*");
+
+            strcpy(new_l->s_data, "cos");
+            new_l->left = root->left;
+
+            root->left = new_l;
+            root->right = copyarg;
         }
         else if (strcmp(root->s_data, "cos") == 0) {
-            ;
+            Node *copyarg = new Node;
+            copyarg->s_data = new char[30];
+            CopyBranch(root->left, copyarg);
+            Dif(copyarg);
+
+            Node *new_l = new Node;
+            new_l->s_data = new char[30];
+            
+            strcpy(root->s_data, "*");
+
+            strcpy(new_l->s_data, "sin");
+            new_l->left = root->left;
+
+            copyarg->d_data = - copyarg->d_data;
+
+            root->left = new_l;
+            root->right = copyarg;
         }
         else {
             printf("oshibka here\n");
@@ -226,6 +295,21 @@ int MakeBranch(Node *root, FILE *file)
         else if (tmp_symb == '*') strcpy(root->s_data, "*");
         else if (tmp_symb == '/') strcpy(root->s_data, "/");
         else if (tmp_symb == '^') strcpy(root->s_data, "^");
+        else if (tmp_symb == ')') {
+            if (root->left->type == VARIOUS) {
+                root->s_data = root->left->s_data;
+                root->type = VARIOUS;
+                delete[] root->left;
+                delete[] root->right;
+            }
+            else if (root->left->type == CONSTANT) {
+                root->d_data = root->left->d_data;
+                root->type = CONSTANT;
+                delete[] root->left;
+                delete[] root->right;
+            }
+            return 0;
+        }
         else {
             printf("ERROR\n");
             return -1;
@@ -246,8 +330,9 @@ int MakeBranch(Node *root, FILE *file)
         } 
     }
     else if (tmp_symb == 'x' || isdigit(tmp_symb)) {
-        
+        $$$
         if (tmp_symb == 'x') {
+            $$$
             strcpy(root->left->s_data, "x");
             root->left->type = VARIOUS;
         }
@@ -274,6 +359,24 @@ int MakeBranch(Node *root, FILE *file)
         else if (tmp_symb == '*') strcpy(root->s_data, "*");
         else if (tmp_symb == '/') strcpy(root->s_data, "/");
         else if (tmp_symb == '^') strcpy(root->s_data, "^");
+        else if (tmp_symb == ')') {
+            if (root->left->type == VARIOUS) {
+                root->s_data = root->left->s_data;
+                root->type = VARIOUS;
+                delete[] root->left;
+                delete[] root->right;
+                root->left = root->right = NULL;
+            }
+            else if (root->left->type == CONSTANT) {
+                root->d_data = root->left->d_data;
+                root->type = CONSTANT;
+                delete[] root->left;
+                delete[] root->right;
+                root->left = root->right = NULL;
+            }
+            
+            return 0;
+        }
         else {
             printf("%cERROR\n", tmp_symb);
             return -1;
@@ -300,6 +403,7 @@ int MakeBranch(Node *root, FILE *file)
 
     }
     else if (isalpha(tmp_symb)) {
+        $$$
         if (tmp_symb == 's') {
             strcpy(root->s_data, "sin");
         }
