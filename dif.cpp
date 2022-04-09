@@ -3,14 +3,18 @@
 int Optimization(Node *root)
 {
     assert(root != NULL);
+
     
     if (root->type == OPER) {
+        //printf("left=%s right=%s\n", root->left->s_data, root->right->s_data);
         
         if (strcmp(root->s_data, "cos") == 0 || strcmp(root->s_data, "sin") == 0) {
+            
             
             Optimization(root->left);
         }
         else if (strcmp(root->s_data, "+") == 0 || strcmp(root->s_data, "-") == 0) {
+            
             
             Optimization(root->left);
             Optimization(root->right);
@@ -61,9 +65,10 @@ int Optimization(Node *root)
             }
         }
         else if (strcmp(root->s_data, "*") == 0) {
+
             Optimization(root->left);
             Optimization(root->right);
-            if (root->left->type == root->right->type == CONSTANT) {
+            if (root->left->type == CONSTANT && root->right->type == CONSTANT) {
                 root->d_data = root->left->d_data * root->right->d_data;
                 root->type = CONSTANT;
                 delete[] root->left;
@@ -136,6 +141,7 @@ int Optimization(Node *root)
             }
         }
         else if (strcmp(root->s_data, "^") == 0) {
+            
             Optimization(root->left);
             Optimization(root->right);
             if (root->right->type == CONSTANT && root->right->d_data == 0) {
@@ -256,14 +262,14 @@ int Dif(Node *root)
             new_r->parent = root;
         }
         else if (strcmp(root->s_data, "^") == 0) {
-            $$$
+            
             if (root->left->type == CONSTANT) {
-                $$$
+            
                 root->d_data = 0;
                 root->type = CONSTANT;
             }
             else if (root->left->type == VARIOUS || root->left->type == OPER) {
-                $$$
+                
                 strcpy(root->s_data, "*");
 
                 Node *new_l = new Node;
@@ -272,10 +278,10 @@ int Dif(Node *root)
                 new_r->s_data = new char[30];
 
                 strcpy(new_l->s_data, "^");
-                new_l->type = OPER;
+            
 
                 strcpy(new_r->s_data, "*");
-                new_l->type = OPER;
+                
 
 
 
@@ -287,11 +293,13 @@ int Dif(Node *root)
                 new_l->left = root->left;
 
                 new_l->right = new Node;
+                new_l->type = OPER;
                 new_l->right->s_data = new char[30];
                 new_l->right->d_data = root->right->d_data - 1;
                 new_l->right->type = CONSTANT;
 
                 new_r->left = l_copyroot;
+                new_r->type = OPER;
                 new_r->right = new Node;
                 new_r->right->type = CONSTANT;
                 new_r->right->s_data = new char[30];
@@ -300,7 +308,7 @@ int Dif(Node *root)
                 root->left = new_l;
                 root->right = new_r;
             }
-            $$$
+            
         }
         else if (strcmp(root->s_data, "sin") == 0) {
             Node *copyarg = new Node;
