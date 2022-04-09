@@ -1,5 +1,162 @@
 #include "dif.h"
 
+int Optimization(Node *root)
+{
+    assert(root != NULL);
+    
+    if (root->type == OPER) {
+        
+        if (strcmp(root->s_data, "cos") == 0 || strcmp(root->s_data, "sin") == 0) {
+            
+            Optimization(root->left);
+        }
+        else if (strcmp(root->s_data, "+") == 0 || strcmp(root->s_data, "-") == 0) {
+            
+            Optimization(root->left);
+            Optimization(root->right);
+
+            if (root->left->type == CONSTANT && root->left->d_data == 0) {
+                
+                Node *tmp = root->right;
+                root->d_data = root->right->d_data;
+                strcpy(root->s_data, root->right->s_data);
+                root->type = root->right->type;
+                root->left = root->right->left;
+                root->right = root->right->right;
+                delete[] tmp;
+            }
+            else if (root->right->type == CONSTANT && root->right->d_data == 0) {
+                
+                Node *tmp = root->left; 
+                root->d_data = root->left->d_data; 
+                strcpy(root->s_data, root->left->s_data);
+                root->type = root->left->type;
+                
+                root->right = root->left->right;
+                root->left = root->left->left;
+                delete[] tmp;
+            }
+            else if (strcmp(root->s_data, "+") == 0) {
+                
+                if (root->left->type == CONSTANT && root->right->type == CONSTANT) {
+                    
+                    root->d_data = root->left->d_data + root->right->d_data;
+                    root->type = CONSTANT;
+                    delete[] root->left;
+                    delete[] root->right;
+                    root->left = NULL;
+                    root->right = NULL;
+                }
+            }
+            else if (strcmp(root->s_data, "-") == 0) {
+                
+                if (root->left->type == root->right->type == CONSTANT) {
+                    root->d_data = root->left->d_data - root->right->d_data;
+                    root->type = CONSTANT;
+                    delete[] root->left;
+                    delete[] root->right;
+                    root->left = NULL;
+                    root->right = NULL;
+                }
+            }
+        }
+        else if (strcmp(root->s_data, "*") == 0) {
+            Optimization(root->left);
+            Optimization(root->right);
+            if (root->left->type == root->right->type == CONSTANT) {
+                root->d_data = root->left->d_data * root->right->d_data;
+                root->type = CONSTANT;
+                delete[] root->left;
+                delete[] root->right;
+                root->left = NULL;
+                root->right = NULL;
+            }
+            else if ((root->right->type == CONSTANT && root->right->d_data == 0) || (root->left->type == CONSTANT && root->left->d_data == 0)) {
+                root->type = CONSTANT;
+                root->d_data = 0;
+                if (root->left != NULL) {
+                    delete[] root->left;
+                    root->left = NULL;
+                }
+                if (root->right != NULL) {
+                    delete[] root->right;
+                    root->right = NULL;
+                }
+            }
+            else if (root->right->type == CONSTANT && root->right->d_data == 1) {
+                Node *tmp = root->left;
+                root->d_data = root->left->d_data;
+                strcpy(root->s_data, root->left->s_data);
+                root->type = root->left->type;
+                root->left = root->left->left;
+                root->right = root->left->right;
+                delete[] tmp;
+            }
+            else if (root->left->type == CONSTANT && root->left->d_data == 1) {
+                Node *tmp = root->right;
+                root->d_data = root->right->d_data;
+                strcpy(root->s_data, root->right->s_data);
+                root->type = root->right->type;
+                root->left = root->right->left;
+                root->right = root->right->right;
+                delete[] tmp;
+            }
+        }
+        else if (strcmp(root->s_data, "/") == 0) {
+            Optimization(root->left);
+            Optimization(root->right);
+            if (root->left->type == root->right->type == CONSTANT) {
+                root->d_data = root->left->d_data / root->right->d_data;
+                root->type = CONSTANT;
+                delete[] root->left;
+                delete[] root->right;
+                root->left = NULL;
+                root->right = NULL;
+            }
+            else if (root->left->type == CONSTANT && root->left->d_data == 0) {
+                root->type = CONSTANT;
+                root->d_data = 0;
+                if (root->left != NULL) {
+                    delete[] root->left;
+                    root->left = NULL;
+                }
+                if (root->right != NULL) {
+                    delete[] root->right;
+                    root->right = NULL;
+                }
+            }
+            else if (root->right->type == CONSTANT && root->right->d_data == 1) {
+                Node *tmp = root->left;
+                root->d_data = root->left->d_data;
+                strcpy(root->s_data, root->left->s_data);
+                root->type = root->left->type;
+                root->left = root->left->left;
+                root->right = root->left->right;
+                delete[] tmp;
+            }
+        }
+        else if (strcmp(root->s_data, "^") == 0) {
+            Optimization(root->left);
+            Optimization(root->right);
+            if (root->right->type == CONSTANT && root->right->d_data == 0) {
+
+                root->type = CONSTANT;
+                root->d_data = 1;
+                if (root->left != NULL) {
+                    delete[] root->left;
+                    root->left = NULL;
+                }
+                if (root->right != NULL) {
+                    delete[] root->right;
+                    root->right = NULL;
+                }
+            }
+        }
+    }
+    
+    return 0;
+}
+
 int Dif(Node *root) 
 {
     
@@ -99,11 +256,14 @@ int Dif(Node *root)
             new_r->parent = root;
         }
         else if (strcmp(root->s_data, "^") == 0) {
+            $$$
             if (root->left->type == CONSTANT) {
+                $$$
                 root->d_data = 0;
                 root->type = CONSTANT;
             }
             else if (root->left->type == VARIOUS || root->left->type == OPER) {
+                $$$
                 strcpy(root->s_data, "*");
 
                 Node *new_l = new Node;
@@ -125,7 +285,11 @@ int Dif(Node *root)
                 Dif(l_copyroot);
 
                 new_l->left = root->left;
+
+                new_l->right = new Node;
+                new_l->right->s_data = new char[30];
                 new_l->right->d_data = root->right->d_data - 1;
+                new_l->right->type = CONSTANT;
 
                 new_r->left = l_copyroot;
                 new_r->right = new Node;
@@ -136,6 +300,7 @@ int Dif(Node *root)
                 root->left = new_l;
                 root->right = new_r;
             }
+            $$$
         }
         else if (strcmp(root->s_data, "sin") == 0) {
             Node *copyarg = new Node;
@@ -163,19 +328,29 @@ int Dif(Node *root)
 
             Node *new_l = new Node;
             new_l->s_data = new char[30];
-            
+
+            Node *new_r = new Node;
+            new_r->s_data = new char[30];
+            new_r->type = OPER;
+            strcpy(new_r->s_data, "*");
+
+            new_r->right = new Node;
+            new_r->right->s_data = new char[30];
+            new_r->right->type = CONSTANT;
+
             strcpy(root->s_data, "*");
 
             strcpy(new_l->s_data, "sin");
             new_l->left = root->left;
 
-            copyarg->d_data = - copyarg->d_data;
+            new_r->left = copyarg;
+            new_r->right->d_data = -1;
 
             root->left = new_l;
-            root->right = copyarg;
+            root->right = new_r;
         }
         else {
-            printf("oshibka here\n");
+            printf("ERROR on line %d\n", __LINE__);
         }
     }
     else if (root->type == VARIOUS) {
@@ -189,7 +364,7 @@ int Dif(Node *root)
         return 0;
     }
     else {
-        printf("error in dif");
+        printf("ERROR on line %d\n", __LINE__);
     }
 
     return 0;
@@ -243,12 +418,6 @@ int MakeTree(Node *root)
 
     MakeBranch(root, file);
 
-    tmp_symb = fgetc(file);
-
-    while(isspace(tmp_symb)) {
-        tmp_symb = fgetc(file);
-    }
-
     fclose(file);
     return 0;
 }
@@ -271,168 +440,130 @@ int MakeBranch(Node *root, FILE *file)
     while(isspace(tmp_symb)) {
         tmp_symb = fgetc(file);
     }
-
+    
     if (tmp_symb == '(') {
         
         MakeBranch(root->left, file);
-
-        tmp_symb = fgetc(file);
-
-        while(isspace(tmp_symb)) {
-            tmp_symb = fgetc(file);
-        }
-
-        tmp_symb = fgetc(file);
-
-        while(isspace(tmp_symb)) {
-            tmp_symb = fgetc(file);
-        }
-
-        root->type = OPER;
-
-        if      (tmp_symb == '+') strcpy(root->s_data, "+");
-        else if (tmp_symb == '-') strcpy(root->s_data, "-");
-        else if (tmp_symb == '*') strcpy(root->s_data, "*");
-        else if (tmp_symb == '/') strcpy(root->s_data, "/");
-        else if (tmp_symb == '^') strcpy(root->s_data, "^");
-        else if (tmp_symb == ')') {
-            if (root->left->type == VARIOUS) {
-                root->s_data = root->left->s_data;
-                root->type = VARIOUS;
-                delete[] root->left;
-                delete[] root->right;
-            }
-            else if (root->left->type == CONSTANT) {
-                root->d_data = root->left->d_data;
-                root->type = CONSTANT;
-                delete[] root->left;
-                delete[] root->right;
-            }
-            return 0;
-        }
-        else {
-            printf("ERROR\n");
-            return -1;
-        }
-
-        tmp_symb = fgetc(file);
-
-        while(isspace(tmp_symb)) {
-            tmp_symb = fgetc(file);
-        }
-
-        MakeBranch(root->right, file);  
-
-        tmp_symb = fgetc(file);
-
-        while(isspace(tmp_symb)) {
-            tmp_symb = fgetc(file);
-        } 
+        
     }
-    else if (tmp_symb == 'x' || isdigit(tmp_symb)) {
-        $$$
-        if (tmp_symb == 'x') {
-            $$$
-            strcpy(root->left->s_data, "x");
-            root->left->type = VARIOUS;
-        }
-        else if (isdigit(tmp_symb)) {
-            ungetc(tmp_symb, file);
-            fscanf(file, "%d", &tmp_num);
-            root->left->d_data = tmp_num;
-            root->left->type = CONSTANT;
-        }
-        else {
-            printf("error\n");
-        }
-
-        tmp_symb = fgetc(file);
-
-        while(isspace(tmp_symb)) {
-            tmp_symb = fgetc(file);
-        }
-
-        root->type = OPER;
-
-        if      (tmp_symb == '+') strcpy(root->s_data, "+");
-        else if (tmp_symb == '-') strcpy(root->s_data, "-");
-        else if (tmp_symb == '*') strcpy(root->s_data, "*");
-        else if (tmp_symb == '/') strcpy(root->s_data, "/");
-        else if (tmp_symb == '^') strcpy(root->s_data, "^");
-        else if (tmp_symb == ')') {
-            if (root->left->type == VARIOUS) {
-                root->s_data = root->left->s_data;
-                root->type = VARIOUS;
-                delete[] root->left;
-                delete[] root->right;
-                root->left = root->right = NULL;
-            }
-            else if (root->left->type == CONSTANT) {
-                root->d_data = root->left->d_data;
-                root->type = CONSTANT;
-                delete[] root->left;
-                delete[] root->right;
-                root->left = root->right = NULL;
-            }
-            
-            return 0;
-        }
-        else {
-            printf("%cERROR\n", tmp_symb);
-            return -1;
-        }
-
-        tmp_symb = fgetc(file);
-
-        while(isspace(tmp_symb)) {
-            tmp_symb = fgetc(file);
-        }
-
-
-        if (tmp_symb == 'x') {
-            strcpy(root->right->s_data, "x");
-            root->right->type = VARIOUS;
-        }
-        else if (isdigit(tmp_symb)) {
-            
-            ungetc(tmp_symb, file);
-            fscanf(file, "%d", &tmp_num);
-            root->right->d_data = tmp_num;
-            root->right->type = CONSTANT;
-        }
-
+    else if (tmp_symb == 'x') {
+        
+        strcpy(root->left->s_data, "x");
+        root->left->type = VARIOUS;
+    }
+    else if (isdigit(tmp_symb)) {
+        ungetc(tmp_symb, file);
+        fscanf(file, "%d", &tmp_num);
+        root->left->d_data = tmp_num;
+        root->left->type = CONSTANT;
     }
     else if (isalpha(tmp_symb)) {
-        $$$
         if (tmp_symb == 's') {
-            strcpy(root->s_data, "sin");
+            
+            strcpy(root->left->s_data, "sin");
         }
-        if (tmp_symb == 'c') {
-            strcpy(root->s_data, "cos");
+        else if (tmp_symb == 'c') {
+            
+            strcpy(root->left->s_data, "cos");
         }
 
-        delete[] root->right;   
+        root->left->left = new Node;
+        root->left->left->s_data = new char[30];
             
-        root->type = OPER;
+        root->left->type = OPER;
+
+        while(tmp_symb != '(') {
+            tmp_symb = fgetc(file);
+        }
+        
+        MakeBranch(root->left->left, file);
+        
+    }
+
+
+    tmp_symb = fgetc(file);
+
+    while(isspace(tmp_symb)) {
+        tmp_symb = fgetc(file);
+    }
+
+    root->type = OPER;
+
+
+    if      (tmp_symb == '+') strcpy(root->s_data, "+");
+    else if (tmp_symb == '-') strcpy(root->s_data, "-");
+    else if (tmp_symb == '*') strcpy(root->s_data, "*");
+    else if (tmp_symb == '/') strcpy(root->s_data, "/");
+    else if (tmp_symb == '^') strcpy(root->s_data, "^");
+    else if (tmp_symb == ')') {
+    
+        root->right = root->left->right;
+        root->type = root->left->type;
+        root->d_data = root->left->d_data;
+        strcpy(root->s_data, root->left->s_data);
+        root->left = root->left->left;
+            
+        return 0;
+    }
+    else {
+        printf("ERROR on line %d\n", __LINE__);
+        return -1;
+    }
+
+    tmp_symb = fgetc(file);
+
+    while(isspace(tmp_symb)) {
+        tmp_symb = fgetc(file);
+    }
+
+    if (tmp_symb == '(') {
+        MakeBranch(root->right, file);
+        
+    }
+    else if (tmp_symb == 'x') {
+        strcpy(root->right->s_data, "x");
+        root->right->type = VARIOUS;
+    }
+    else if (isdigit(tmp_symb)) {
+        ungetc(tmp_symb, file);
+        fscanf(file, "%d", &tmp_num);
+        root->right->d_data = tmp_num;
+        root->right->type = CONSTANT;
+    }
+    else if (isalpha(tmp_symb)) {
+        
+        if (tmp_symb == 's') {
+            
+            strcpy(root->right->s_data, "sin");
+        }
+        if (tmp_symb == 'c') {
+            
+            strcpy(root->right->s_data, "cos");
+        }
+
+        root->right->left = new Node;
+        root->right->left->s_data = new char[30];
+        
+            
+        root->right->type = OPER;
 
         while(tmp_symb != '(') {
             tmp_symb = fgetc(file);
         }
 
-        while(isspace(tmp_symb)) {
-            tmp_symb = fgetc(file);
-        }
-
-        MakeBranch(root->left, file);
-
-        tmp_symb = fgetc(file);
-
-        while(isspace(tmp_symb)) {
-            tmp_symb = fgetc(file);
-        }
+        MakeBranch(root->right->left, file);
         
-    }
+        tmp_symb = fgetc(file);
     
+    }
+
+    tmp_symb = fgetc(file);
+
+    while(isspace(tmp_symb)) {
+        tmp_symb = fgetc(file);
+    }
+
+
 
     return 0;
 }
@@ -462,11 +593,11 @@ int PrintStruct(FILE *graph, Node *node, int *global_counter)
     int tmp_counter = *global_counter;
 
     if (node->type == VARIOUS || node->type == OPER) {
-        fprintf(graph, "\tstruct%d [shape=record,label=\"{<f0>%s | {<f1> left | <f2> right} }\" ];\n", 
+        fprintf(graph, "\tstruct%d [shape=record,label=\"{<f0>%s}\" ];\n", //fprintf(graph, "\tstruct%d [shape=record,label=\"{<f0>%s | {<f1> left | <f2> right} }\" ];\n", 
         *global_counter, node->s_data);
     }
     else {
-        fprintf(graph, "\tstruct%d [shape=record,label=\"{<f0>%d | {<f1> left | <f2> right} }\" ];\n", 
+        fprintf(graph, "\tstruct%d [shape=record,label=\"{<f0>%d}\" ];\n", 
         *global_counter, node->d_data);
     }
     if (node->left == NULL && node->right == NULL) 

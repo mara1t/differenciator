@@ -36,3 +36,4 @@ int PrintDot(Node*);
 int PrintStruct(FILE*, Node*, int*);
 int Dif(Node *root);
 int CopyBranch(Node *root, Node *copyroot);
+int Optimization(Node *);
