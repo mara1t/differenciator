@@ -4,7 +4,7 @@ int Latex(Node *root)
 {
     assert(root != NULL);
     FILE *f = fopen("lat.txt", "w");
-    fprintf(f, "\\documentclass{article}\n \\begin{document}\n\n\\[\n");
+    fprintf(f, "\\documentclass{article}\n\\begin{document}\n\n\\[\n");
 
     LatexIn(root, f);
 
@@ -24,10 +24,20 @@ int LatexIn(Node *root, FILE *f)
             fprintf(f, "}");
         }
         else if (strcmp(root->s_data, "*") == 0) {
-            
-            LatexIn(root->left, f);
+            if (root->left->type == OPER) {
+                fprintf(f, "(");
+                LatexIn(root->left, f);
+                fprintf(f, ")");
+            }
+            else LatexIn(root->left, f);
+
             fprintf(f, " \\cdot ");
-            LatexIn(root->right, f);
+            if (root->right->type == OPER) {
+                fprintf(f, "(");
+                LatexIn(root->right, f);
+                fprintf(f, ")");
+            }
+            else LatexIn(root->right, f);
             
         }
         else if (strcmp(root->s_data, "sin") == 0 || strcmp(root->s_data, "ln") == 0 || strcmp(root->s_data, "cos") == 0) {
@@ -36,9 +46,21 @@ int LatexIn(Node *root, FILE *f)
             fprintf(f, ")");
         }
         else {
-            LatexIn(root->left, f);
+            if (root->left->type == OPER) {
+                fprintf(f, "(");
+                LatexIn(root->left, f);
+                fprintf(f, ")");
+            }
+            else LatexIn(root->left, f);
+
             fprintf(f, "%s", root->s_data);
-            LatexIn(root->right, f);
+
+            if (root->right->type == OPER) {
+                fprintf(f, "(");
+                LatexIn(root->right, f);
+                fprintf(f, ")");
+            }
+            else LatexIn(root->right, f);
 
         }
     }

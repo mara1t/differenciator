@@ -1,9 +1,13 @@
 digraph G{
-	struct0 [shape=record,label="{<f0>sin | 0x7fffd8d3feb0 | (nil)}" ];
+	struct0 [shape=record,label="{<f0>sin | 0x7fffdcfdfeb0 | (nil)}" ];
 	struct0->struct1;
-	struct1 [shape=record,label="{<f0>+ | 0x7fffd8d411f0 | 0x7fffd8d41110}" ];
+	struct1 [shape=record,label="{<f0>* | 0x7fffdcfe11f0 | 0x7fffdcfe1110}" ];
 	struct1->struct2;
-	struct2 [shape=record,label="{<f0>x | 0x7fffd8d41260 | 0x7fffd8d411f0}" ];
+	struct2 [shape=record,label="{<f0>x | 0x7fffdcfe1260 | 0x7fffdcfe11f0}" ];
 	struct1->struct3;
-	struct3 [shape=record,label="{<f0>1 | 0x7fffd8d412d0 | 0x7fffd8d411f0}" ];
+	struct3 [shape=record,label="{<f0>^ | 0x7fffdcfe12d0 | 0x7fffdcfe11f0}" ];
+	struct3->struct4;
+	struct4 [shape=record,label="{<f0>x | 0x7fffdcfe1340 | 0x7fffdcfe12d0}" ];
+	struct3->struct5;
+	struct5 [shape=record,label="{<f0>3 | 0x7fffdcfe13b0 | 0x7fffdcfe12d0}" ];
 }
