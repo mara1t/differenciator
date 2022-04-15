@@ -1,19 +1,9 @@
 digraph G{
-	struct0 [shape=record,label="{<f0>*}" ];
+	struct0 [shape=record,label="{<f0>sin | 0x7fffd8d3feb0 | (nil)}" ];
 	struct0->struct1;
-	struct1 [shape=record,label="{<f0>^}" ];
+	struct1 [shape=record,label="{<f0>+ | 0x7fffd8d411f0 | 0x7fffd8d41110}" ];
 	struct1->struct2;
-	struct2 [shape=record,label="{<f0>sin}" ];
-	struct2->struct3;
-	struct3 [shape=record,label="{<f0>x}" ];
-	struct1->struct5;
-	struct5 [shape=record,label="{<f0>1}" ];
-	struct0->struct6;
-	struct6 [shape=record,label="{<f0>*}" ];
-	struct6->struct7;
-	struct7 [shape=record,label="{<f0>cos}" ];
-	struct7->struct8;
-	struct8 [shape=record,label="{<f0>x}" ];
-	struct6->struct10;
-	struct10 [shape=record,label="{<f0>2}" ];
+	struct2 [shape=record,label="{<f0>x | 0x7fffd8d41260 | 0x7fffd8d411f0}" ];
+	struct1->struct3;
+	struct3 [shape=record,label="{<f0>1 | 0x7fffd8d412d0 | 0x7fffd8d411f0}" ];
 }
