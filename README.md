@@ -9,7 +9,8 @@
     &emsp; make launch    
       
  
-**EXIT**:  
+**EXIT**: 
+in order to see Latex, copy text from file "lat.txt" to site(overleaf.com for instanse)  
 
 [LatexFile.pdf](https://github.com/mara1t/differenciator/files/8496746/LatexFile.pdf)    
 
