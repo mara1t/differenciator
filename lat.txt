@@ -2,7 +2,7 @@
 \begin{document}
 
 \[
-sin(x \cdot (x^3))
+((cos(x))^x) \cdot (x+(ln(cos(x))))
 \]
 
 \end{document}

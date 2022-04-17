@@ -32,10 +32,10 @@ struct Node {
 
 int MakeBranch(Node *root, FILE *);
 int MakeTree(Node *root);
-int PrintDot(Node*);
+int PrintDot(Node*, char*);
 int PrintStruct(FILE*, Node*, int*);
 int Dif(Node *root);
 int CopyBranch(Node *root, Node *copyroot);
 int Optimization(Node *);
-int Latex(Node *);
+int Latex(Node *, char*);
 int LatexIn(Node *, FILE *);

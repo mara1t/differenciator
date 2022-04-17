@@ -1,13 +1,21 @@
 digraph G{
-	struct0 [shape=record,label="{<f0>sin | 0x7fffdcfdfeb0 | (nil)}" ];
+	struct0 [shape=record,label="{<f0>*}" ];
 	struct0->struct1;
-	struct1 [shape=record,label="{<f0>* | 0x7fffdcfe11f0 | 0x7fffdcfe1110}" ];
+	struct1 [shape=record,label="{<f0>^}" ];
 	struct1->struct2;
-	struct2 [shape=record,label="{<f0>x | 0x7fffdcfe1260 | 0x7fffdcfe11f0}" ];
-	struct1->struct3;
-	struct3 [shape=record,label="{<f0>^ | 0x7fffdcfe12d0 | 0x7fffdcfe11f0}" ];
-	struct3->struct4;
-	struct4 [shape=record,label="{<f0>x | 0x7fffdcfe1340 | 0x7fffdcfe12d0}" ];
-	struct3->struct5;
-	struct5 [shape=record,label="{<f0>3 | 0x7fffdcfe13b0 | 0x7fffdcfe12d0}" ];
+	struct2 [shape=record,label="{<f0>cos}" ];
+	struct2->struct3;
+	struct3 [shape=record,label="{<f0>x}" ];
+	struct1->struct5;
+	struct5 [shape=record,label="{<f0>x}" ];
+	struct0->struct6;
+	struct6 [shape=record,label="{<f0>+}" ];
+	struct6->struct7;
+	struct7 [shape=record,label="{<f0>x}" ];
+	struct6->struct8;
+	struct8 [shape=record,label="{<f0>ln}" ];
+	struct8->struct9;
+	struct9 [shape=record,label="{<f0>cos}" ];
+	struct9->struct10;
+	struct10 [shape=record,label="{<f0>x}" ];
 }

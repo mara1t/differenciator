@@ -1,9 +1,9 @@
 #include "dif.h"
 
-int Latex(Node *root)
+int Latex(Node *root, char*filename)
 {
     assert(root != NULL);
-    FILE *f = fopen("lat.txt", "w");
+    FILE *f = fopen(filename, "w");
     fprintf(f, "\\documentclass{article}\n\\begin{document}\n\n\\[\n");
 
     LatexIn(root, f);
@@ -41,7 +41,7 @@ int LatexIn(Node *root, FILE *f)
             
         }
         else if (strcmp(root->s_data, "sin") == 0 || strcmp(root->s_data, "ln") == 0 || strcmp(root->s_data, "cos") == 0) {
-            fprintf(f, "sin(");
+            fprintf(f, "%s(", root->s_data);
             LatexIn(root->left, f);
             fprintf(f, ")");
         }
@@ -82,7 +82,6 @@ int Optimization(Node *root)
     if (root->type == OPER) {
         
         if (strcmp(root->s_data, "cos") == 0 || strcmp(root->s_data, "sin") == 0) {
-            $$$
             Optimization(root->left);
             if (root->left->type == CONSTANT) {
                 if (strcmp(root->s_data, "sin") == 0) {
@@ -102,7 +101,6 @@ int Optimization(Node *root)
                     root->left = NULL;
                 }    
             }
-            $$$
         }
         else if (strcmp(root->s_data, "+") == 0 || strcmp(root->s_data, "-") == 0) {
             
@@ -163,7 +161,6 @@ int Optimization(Node *root)
             }
         }
         else if (strcmp(root->s_data, "*") == 0) {
-            $$$
             Optimization(root->left);
             Optimization(root->right);
             if (root->left->type == CONSTANT && root->right->type == CONSTANT) {
@@ -209,7 +206,6 @@ int Optimization(Node *root)
                 if (root->left != NULL)
                     root->left->parent = root;
             }
-            $$$
         }
         else if (strcmp(root->s_data, "/") == 0) {
             Optimization(root->left);
@@ -422,6 +418,40 @@ int Dif(Node *root)
         }
         else if (strcmp(root->s_data, "^") == 0) {
 
+            Node *copyroot = new Node;
+            copyroot->s_data = new char[30];
+            CopyBranch(root, copyroot);
+
+            Node *l_copyroot = new Node;
+            l_copyroot->s_data = new char[30];
+            CopyBranch(root->left, l_copyroot);
+
+            Node *r_copyroot = new Node;
+            r_copyroot->s_data = new char[30];
+            CopyBranch(root->right, r_copyroot);
+
+            strcpy(root->s_data, "*");
+
+            root->left = copyroot;
+            root->left->parent = root;
+
+            root->right->type = OPER;
+            strcpy(root->right->s_data, "*");
+            root->right->left = r_copyroot;
+            root->right->left->parent = root->right;
+
+            if (root->right->right == NULL) {
+                root->right->right = new Node;;
+                root->right->right->s_data = new char[30];
+            }
+            root->right->right->parent = root->right;
+            root->right->right->type = OPER;
+            strcpy(root->right->right->s_data, "ln");
+            root->right->right->left = l_copyroot;
+
+            Dif(root->right);
+
+            /*
             if (root->left->type == CONSTANT) {
             
                 root->d_data = 0;
@@ -484,7 +514,7 @@ int Dif(Node *root)
             else {
                 ;
             }
-            
+            */
             
         }
         else if (strcmp(root->s_data, "sin") == 0) {
@@ -803,11 +833,11 @@ int MakeBranch(Node *root, FILE *file)
     return 0;
 }
 
-int PrintDot(Node *root)
+int PrintDot(Node *root, char* filename)
 {
     assert(root != NULL);
 
-    FILE *graph = fopen("graph.txt", "w");
+    FILE *graph = fopen(filename, "w");
 
     int global_counter = 0;
 
@@ -833,13 +863,13 @@ int PrintStruct(FILE *graph, Node *node, int *global_counter)
     int tmp_counter = *global_counter;
 
     if (node->type == VARIOUS || node->type == OPER) {
-        fprintf(graph, "\tstruct%d [shape=record,label=\"{<f0>%s | %p | %p}\" ];\n", //fprintf(graph, "\tstruct%d [shape=record,label=\"{<f0>%s | {<f1> left | <f2> right} }\" ];\n", 
-        *global_counter, node->s_data, node, node->parent);
+        fprintf(graph, "\tstruct%d [shape=record,label=\"{<f0>%s}\" ];\n", //fprintf(graph, "\tstruct%d [shape=record,label=\"{<f0>%s | {<f1> left | <f2> right} }\" ];\n", 
+        *global_counter, node->s_data);
         
     }
     else {
-        fprintf(graph, "\tstruct%d [shape=record,label=\"{<f0>%lg | %p | %p}\" ];\n", 
-        *global_counter, node->d_data, node, node->parent);
+        fprintf(graph, "\tstruct%d [shape=record,label=\"{<f0>%lg}\" ];\n", 
+        *global_counter, node->d_data);
     }
     if (node->left == NULL && node->right == NULL) {
         //(*global_counter)++;

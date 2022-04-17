@@ -6,11 +6,12 @@ int main()
     root->s_data = new char[30];
     MakeTree(root);
 
-    //Dif(root);
+    Dif(root);
     Optimization(root);
-    Latex(root);
 
-    PrintDot(root);
+    Latex(root, (char*)"lat.txt");
+
+    PrintDot(root, (char*)"graph.txt");
 
     return 0;
 }
