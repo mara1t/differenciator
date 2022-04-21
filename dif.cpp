@@ -210,7 +210,7 @@ int Optimization(Node *root)
         else if (strcmp(root->s_data, "/") == 0) {
             Optimization(root->left);
             Optimization(root->right);
-            if (root->left->type == root->right->type == CONSTANT) {
+            if (root->left->type == CONSTANT && root->right->type == CONSTANT) {
                 root->d_data = root->left->d_data / root->right->d_data;
                 root->type = CONSTANT;
                 delete[] root->left;
